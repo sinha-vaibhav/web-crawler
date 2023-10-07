@@ -37,7 +37,7 @@ def parse_arguments(context : Context):
         context.log_file = args.file_to_log
     
     if args.max_urls is not None:
-        context.max_urls = args.max_urls
+        context.max_urls = int(args.max_urls)
     
     context.num_workers = int(args.num_workers)
     
@@ -51,7 +51,7 @@ def parse_arguments(context : Context):
     else:
         temp_file_name = context.domain
         temp_file_name = temp_file_name.replace(".", "_")
-        context.crawl_results_file = temp_file_name + '_crawl_results.json'
+        context.crawl_results_file = temp_file_name  + '_crawl_results.json'
 
 
 
