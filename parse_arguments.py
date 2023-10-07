@@ -43,7 +43,7 @@ def parse_arguments(context : Context):
     context.log_level = args.loglevel
     
     context.starting_url = urlunparse((context.scheme, context.domain,'','','',''))
-    context.urls_to_visit.put(context.starting_url)
+    context.urls_to_crawl.put(context.starting_url)
 
 
 

@@ -1,12 +1,11 @@
 import logging
-from urllib.parse import urlparse,urljoin
+from threading import Thread
+from urllib.parse import urlparse
 import requests
 from crawler_context import Context
 
 from html.parser import HTMLParser
 import time
-
-
 
 class HTMLLinkParser(HTMLParser):
 
@@ -35,36 +34,40 @@ def extract_urls(context : Context, url: str) -> list[str]:
         context.failed_urls[url] = str(e)
         return []
 
-def get_url_domain(url : str):
-    return urlparse(url).netloc
+def extract_urls_single(url: str) -> list[str]:
+    logging.debug(f"Extracting url for {url}")
+    try:
+        #  not having robots
+        contents = requests.get(url).text
+        parser = HTMLLinkParser()
+        parser.feed(contents)
+        return parser.urls_extracted
+    except Exception as e:
+        logging.exception(f"Error in fetching URL - {url}")
+        # context.failed_urls[url] = str(e)
+        return []
 
-def crawl_urls(context : Context):
-
-    while context.urls_to_visit.qsize() != 0:
-
-        url_to_visit = context.urls_to_visit.get()
-
-        logging.debug(f"Crawling URL = {url_to_visit}")
-        logging.debug(f"URLs left to crawl  = {context.urls_to_visit.qsize()}")
-        logging.debug(f"Number of Visited URls = {len(context.visited_urls)}")
-
-        if len(context.visited_urls) % 15 == 0:
-            logging.debug("Sleeping for 2 seconds")
-            logging.info(f"URLs left to crawl  = {context.urls_to_visit.qsize()}")
-            logging.info(f"Number of Visited URls = {len(context.visited_urls)}")
-            time.sleep(2)
-
-        urls_extracted = extract_urls(context, url_to_visit)
+def extract_urls_and_update(context,url: str):
+    logging.debug(f"Extracting url for {url}")
+    try:
+        if not context.robot_file_parser.can_fetch(context.robot_parser_agent_name, url):
+            context.robot_restricted_urls.add(url)
+            logging.debug(f"URL restricted due to robots.txt restriction : {url}")
+            return []
+        contents = requests.get(url).text
+        parser = HTMLLinkParser()
+        parser.feed(contents)
+        urls_extracted = parser.urls_extracted
 
         if urls_extracted is None:
-            continue
-        context.crawl_results[url_to_visit] = set(urls_extracted)
+            return []
+        context.crawl_results[url] = set(urls_extracted)
 
-        context.visited_urls.add(url_to_visit)
+        context.visited_urls.add(url)
 
         if  context.max_urls is not None and (context.visited_urls >= context.max_urls):
             logging.info("Stopping early as we crawled maximum urls limit set in parameters - {context.max_urls}")
-            break
+            return[]
 
         for url in urls_extracted:
             url_domain = get_url_domain(url)
@@ -77,10 +80,41 @@ def crawl_urls(context : Context):
             context.urls_to_visit.put(url)
         
         context.urls_to_visit.task_done()
+    except Exception as e:
+        logging.exception(f"Error in fetching URL - {url}")
+        context.failed_urls[url] = str(e)
+    
+
+
+def get_url_domain(url : str):
+    return urlparse(url).netloc
+
+def crawl_urls(context):
+    while context.urls_to_crawl.qsize() != 0 or context.visiting_urls.qsize() != 0:
+        logging.debug(f" Number of urls to crawl {context.urls_to_crawl.qsize()}, Number of visiting urls = {context.visiting_urls.qsize()} ")
         
+        if (context.urls_to_crawl.qsize() == 0):
+            logging.debug("No more urls to visit in this thread, waiting 5 seconds for other threads to populate urls to visit")
+            time.sleep(5)
+            continue
+        url_to_visit = context.urls_to_crawl.get()
 
+        context.visiting_urls.put(url_to_visit)
 
+        logging.debug(f"Crawling URL = {url_to_visit}")
+        urls_extracted = extract_urls(context,url_to_visit)
+        logging.debug(f"Extracted {len(urls_extracted)} URLs from crawling {url_to_visit}")
+        context.crawl_results[url_to_visit] = set(urls_extracted)
+        context.crawled_urls.put(context.visiting_urls.get())
+        
+        if urls_extracted is None:
+            continue
 
-
-
-
+        for url in urls_extracted:
+            url_domain = get_url_domain(url)
+            if url_domain != context.domain:
+                continue
+            if url in context.crawled_urls.queue or url in context.urls_to_crawl.queue:
+                continue
+            logging.debug(f"Adding URL to visit : {url}")
+            context.urls_to_crawl.put(url)
