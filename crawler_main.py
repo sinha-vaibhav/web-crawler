@@ -1,7 +1,7 @@
 
 import sys
 from parse_arguments import parse_arguments
-from crawl_utils import crawl_urls 
+from crawler_utils import crawl_urls 
 from crawler_context import Context
 from threading import Thread
 import logging
