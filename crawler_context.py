@@ -16,8 +16,9 @@ class Context:
     max_urls = None
 
     
-    urls_to_visit  = Queue()
-    visited_urls  = set()
+    urls_to_crawl  = Queue()
+    visiting_urls = Queue()
+    crawled_urls = Queue()
     failed_urls = {}
     robot_restricted_urls = set()
 
