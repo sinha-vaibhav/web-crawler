@@ -19,6 +19,9 @@ Example
 python3 crawler_main.py -u https://yogananda.org --log DEBUG -m 100 -n 5 
 ```
 
+
+```
+
 usage: crawler_main.py [-h] [-u URL] [-m MAX_URLS] [-log_file FILE_TO_LOG] [-n NUM_WORKERS] [-r RESULTS_FILE]
                        [-log {CRITICAL,FATAL,ERROR,WARN,WARNING,INFO,DEBUG,NOTSET}]
 
