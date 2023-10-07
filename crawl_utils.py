@@ -43,7 +43,7 @@ def extract_urls(context : Context, url: str) -> list[str]:
 def get_url_domain(url : str) -> str:
     return urlparse(url).netloc
 
-def crawl_urls(context) -> None:
+def crawl_urls(context : Context) -> None:
     while context.urls_to_crawl.qsize() != 0 or context.visiting_urls.qsize() != 0:
         logging.debug(f" Number of urls to crawl {context.urls_to_crawl.qsize()}, Number of visiting urls = {context.visiting_urls.qsize()} ")
         

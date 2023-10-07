@@ -6,9 +6,6 @@ from crawler_context import Context
 from threading import Thread
 import logging
 import json
-
-
-
 import time
 
 if __name__ =="__main__":
