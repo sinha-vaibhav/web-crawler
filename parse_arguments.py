@@ -11,6 +11,7 @@ def parse_arguments(context : Context):
     parser.add_argument("-m", "--max_urls",default=None, help = "Maximum URLs to crawl")
     parser.add_argument("-log_file", "--file_to_log", help = "log file to dump logs")
     parser.add_argument("-n", "--num_workers", default=1, help = "number of concurrent crawlers, default 1")
+    parser.add_argument("-r", "--results_file", help = "File to write results in, by default we set it to <website-name>_crawl_results.json")
     parser.add_argument( '-log','--loglevel', default='warning', help='Provide logging level. Example --loglevel debug, default=warning', choices=logging._nameToLevel.keys())
     args = parser.parse_args()
 
@@ -44,6 +45,13 @@ def parse_arguments(context : Context):
     
     context.starting_url = urlunparse((context.scheme, context.domain,'','','',''))
     context.urls_to_crawl.put(context.starting_url)
+
+    if args.results_file is not None:
+        context.crawl_results_file = args.results_file
+    else:
+        temp_file_name = context.domain
+        temp_file_name = temp_file_name.replace(".", "_")
+        context.crawl_results_file = temp_file_name + '_crawl_results.json'
 
 
 

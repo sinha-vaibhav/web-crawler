@@ -31,6 +31,8 @@ class Context:
     log_file : str = None
     log_level: str = None
 
+    crawl_results_file : str = None
+
         
     def initialize_robot_file_parser(self):
         self.robot_file_url = urljoin(self.starting_url, "robots.txt")
