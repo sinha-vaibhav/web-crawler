@@ -44,8 +44,9 @@ def get_url_domain(url : str) -> str:
     return urlparse(url).netloc
 
 def crawl_urls(context : Context) -> None:
-    while context.urls_to_crawl.qsize() != 0 or context.visiting_urls.qsize() != 0:
-        logging.debug(f" Number of urls to crawl {context.urls_to_crawl.qsize()}, Number of visiting urls = {context.visiting_urls.qsize()} ")
+    
+    while context.urls_to_crawl.qsize() != 0 or context.crawling_urls.qsize() != 0:
+        logging.debug(f" Number of urls to crawl {context.urls_to_crawl.qsize()}, Number of visiting urls = {context.crawling_urls.qsize()} ")
         
         if (context.urls_to_crawl.qsize() == 0):
             logging.debug("No more urls to visit in this thread, waiting 5 seconds for other threads to populate urls to visit")
@@ -53,13 +54,13 @@ def crawl_urls(context : Context) -> None:
             continue
         url_to_visit = context.urls_to_crawl.get()
 
-        context.visiting_urls.put(url_to_visit)
+        context.crawling_urls.put(url_to_visit)
 
         logging.debug(f"Crawling URL = {url_to_visit}")
         urls_extracted = extract_urls(context,url_to_visit)
         logging.debug(f"Extracted {len(urls_extracted)} URLs from crawling {url_to_visit}")
         context.crawl_results[url_to_visit] = set(urls_extracted)
-        context.crawled_urls.put(context.visiting_urls.get())
+        context.crawled_urls.put(context.crawling_urls.get())
 
         if context.crawled_urls.qsize() >= context.max_urls:
             logging.info(f"Crawled {context.crawled_urls.qsize()} URLs, stopping early due to max urls parameter")

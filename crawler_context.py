@@ -17,7 +17,7 @@ class Context:
 
     
     urls_to_crawl  = Queue()
-    visiting_urls = Queue()
+    crawling_urls = Queue()
     crawled_urls = Queue()
     failed_urls = {}
     robot_restricted_urls = set()
