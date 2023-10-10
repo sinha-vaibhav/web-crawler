@@ -1,0 +1,9 @@
+# robotstxt.org/
+
+User-agent: *
+Disallow: /docs/
+Disallow: /referral/
+Disallow: /-staging-referral/
+Disallow: /install/
+Disallow: /blog/authors/
+Disallow: /-deeplinks/

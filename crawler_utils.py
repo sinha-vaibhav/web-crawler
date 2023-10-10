@@ -9,11 +9,12 @@ import time
 
 class HTMLLinkParser(HTMLParser):
 
-    urls_extracted = []
-
+    
     def __init__(self, starting_url):
         super().__init__()
         self.starting_url = starting_url
+        self.urls_extracted = []
+
 
     def handle_starttag(self, tag, attrs) -> None:
         if tag == 'a':
@@ -43,6 +44,9 @@ def extract_urls(context : Context, url: str) -> list[str]:
 def get_url_domain(url : str) -> str:
     return urlparse(url).netloc
 
+def get_url_domain_test(url : str) -> str:
+    return get_url_domain(url)
+
 def crawl_urls(context : Context) -> None:
     
     while context.urls_to_crawl.qsize() != 0 or context.crawling_urls.qsize() != 0:
@@ -62,7 +66,7 @@ def crawl_urls(context : Context) -> None:
         context.crawl_results[url_to_visit] = set(urls_extracted)
         context.crawled_urls.put(context.crawling_urls.get())
 
-        if context.crawled_urls.qsize() >= context.max_urls:
+        if context.max_urls is not None and context.crawled_urls.qsize() >= context.max_urls:
             logging.info(f"Crawled {context.crawled_urls.qsize()} URLs, stopping early due to max urls parameter")
             break
 
