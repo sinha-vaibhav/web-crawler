@@ -7,3 +7,4 @@ Disallow: /-staging-referral/
 Disallow: /install/
 Disallow: /blog/authors/
 Disallow: /-deeplinks/
+Disallow: /page6

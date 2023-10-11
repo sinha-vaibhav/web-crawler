@@ -8,30 +8,36 @@ from urllib.parse import urljoin
 
 class Context:
 
-    scheme : str = None
-    domain : str = None
-    starting_url : str = None
-
-    num_workers : int = 1
-    max_urls = None
-
+   
     
-    urls_to_crawl  = Queue()
-    crawling_urls = Queue()
-    crawled_urls = Queue()
-    failed_urls = {}
-    robot_restricted_urls = set()
+    
 
-    robot_file_url : str = None
-    robot_file_parser = RobotFileParser()
-    robot_parser_agent_name : str = "*"
+    def __init__(self):
+        self.scheme = None
+        self.domain = None
+        self.starting_url= None
 
-    crawl_results = {}
+        self.num_workers = 1
+        self.max_urls = None
 
-    log_file : str = None
-    log_level: str = None
+        self.urls_to_crawl  = Queue()
+        self.crawling_urls = Queue()
+        self.crawled_urls = Queue()
+        self.failed_urls = {}
+        self.robot_restricted_urls = set()
 
-    crawl_results_file : str = None
+        self.robot_file_url : str = None
+        self.robot_file_parser = RobotFileParser()
+        self.robot_parser_agent_name : str = "*"
+
+        self.crawl_results = {}
+        self.crawl_results_file = None
+
+
+        self.log_file : str = None
+        self.log_level: str = None
+
+
 
         
     def initialize_robot_file_parser(self):

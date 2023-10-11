@@ -1,11 +1,30 @@
 import logging
 from threading import Thread
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlunparse
 import requests
 from crawler_context import Context
 
 from html.parser import HTMLParser
 import time
+
+
+def get_url_scheme_and_domain(url : str) -> (str,str):
+    parsed_url = urlparse(url)
+    if parsed_url.netloc == '':
+        logging.fatal(" Invalid URL, Did you specify the // parameter at the starting of the URL")
+        # TODO, add common causes of not getting netloc
+        exit()
+    domain = parsed_url.netloc
+    if parsed_url.scheme == '':
+        logging.info("URL scheme not specified, using https as default")
+        scheme = 'https'
+    else:
+        scheme = parsed_url.scheme
+
+    return (scheme, domain)
+
+def get_starting_url(scheme : str, domain : str) -> str:
+    return urlunparse((scheme, domain,'','','',''))
 
 class HTMLLinkParser(HTMLParser):
 
@@ -44,9 +63,6 @@ def extract_urls(context : Context, url: str) -> list[str]:
 def get_url_domain(url : str) -> str:
     return urlparse(url).netloc
 
-def get_url_domain_test(url : str) -> str:
-    return get_url_domain(url)
-
 def crawl_urls(context : Context) -> None:
     
     while context.urls_to_crawl.qsize() != 0 or context.crawling_urls.qsize() != 0:
@@ -78,3 +94,13 @@ def crawl_urls(context : Context) -> None:
                 continue
             logging.debug(f"Adding URL to visit : {url}")
             context.urls_to_crawl.put(url)
+    
+
+def crawl_urls_main(context : Context) -> None:
+    threads = []
+    for i in range(context.num_workers):
+        thread = Thread(target=crawl_urls, args=(context,), daemon=True)
+        thread.start()
+        threads.append(thread)
+
+    [thread.join() for thread in threads]  

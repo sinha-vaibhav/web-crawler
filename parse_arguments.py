@@ -1,9 +1,11 @@
 import argparse
 import logging
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlunparse
 from crawler_context import Context
+from crawler_utils import get_url_scheme_and_domain, get_starting_url
 
-def parse_arguments(context : Context):
+
+def parse_arguments(context : Context) -> None:
 
     parser = argparse.ArgumentParser(description = "Web Crawler")
 
@@ -21,17 +23,7 @@ def parse_arguments(context : Context):
         exit()
     else:
         logging.info("URL specified = ", args.url)
-        parsed_url = urlparse(args.url)
-        if parsed_url.netloc == '':
-            logging.fatal(" Invalid URL, Did you specify the // parameter at the starting of the URL")
-            # TODO, add common causes of not getting netloc
-            exit()
-        context.domain = parsed_url.netloc
-        if parsed_url.scheme == '':
-            logging.info("URL scheme not specified, using https as default")
-            context.scheme = 'https'
-        else:
-            context.scheme = parsed_url.scheme
+        (context.scheme, context.domain) = get_url_scheme_and_domain(args.url)
     
     if args.file_to_log is not None:
         context.log_file = args.file_to_log
@@ -43,7 +35,7 @@ def parse_arguments(context : Context):
     
     context.log_level = args.loglevel
     
-    context.starting_url = urlunparse((context.scheme, context.domain,'','','',''))
+    context.starting_url = get_starting_url(context.scheme, context.domain)
     context.urls_to_crawl.put(context.starting_url)
 
     if args.results_file is not None:

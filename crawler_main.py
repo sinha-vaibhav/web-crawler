@@ -1,7 +1,7 @@
 
 import sys
 from parse_arguments import parse_arguments
-from crawler_utils import crawl_urls 
+from crawler_utils import crawl_urls, crawl_urls_main 
 from crawler_context import Context
 from threading import Thread
 import logging
@@ -26,13 +26,7 @@ if __name__ =="__main__":
 
     tic = time.perf_counter() 
 
-    threads = []
-    for i in range(context.num_workers):
-        thread = Thread(target=crawl_urls, args=(context,), daemon=True)
-        thread.start()
-        threads.append(thread)
-
-    [thread.join() for thread in threads]        
+    crawl_urls_main(context)     
 
     toc = time.perf_counter()
 
