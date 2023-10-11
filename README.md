@@ -11,6 +11,7 @@ Some of the features of the crawler:
 - has logging and testing support for easier debugging and monitoring
 
 
+
 ## How it works?
 
 1. We specify a url of the website we want to crawl and other required parameters in the command line tool
@@ -22,20 +23,21 @@ e.g. www.google.com
 
 4. We spawn multiple crawler threads and for each thread we do the following:
 
-    a. while there are urls to crawl (urls_to_crawl queue) & URLs being visited (urls_crawline queue):
 
+```
+   while there are urls to crawl (urls_to_crawl queue) & URLs being visited (urls_crawline queue)
 
-        b. we extract a URL to crawl from urls_to_crawl to queue -> url_to_crawl
+        we extract a URL to crawl from urls_to_crawl to queue -> url_to_crawl
 
-        c. move this url to crawling_urls queue
+        move this url to crawling_urls queue
 
-        d. if robots.txt allows crawling of this URL -> We fetch that URL and extract all urls inside it, else we skip it
+        if robots.txt allows crawling of this URL -> We fetch that URL and extract all urls inside it, else we skip it
 
-        e. add this url and the urls extracted inside it to result
+        add this url and the urls extracted inside it to result
 
-        f. move this url from crawling_urls queue -> urls_crawled queue
+        move this url from crawling_urls queue -> urls_crawled queue
 
-        f. for each url extracted in step d
+        for each url extracted in earlier step
 
             we skip it if
                 url is in a different domain than main url
@@ -44,7 +46,9 @@ e.g. www.google.com
             else 
                 we add this URL to be crawled later by adding it in urls_to_crawl queue
 
+```
 
+5. once all the urls are crawled, we write the results in a file. (default : <website_domain>_crawl_results.json)
 
 ## Flow Diagram
 
@@ -58,7 +62,6 @@ Example
 ```
 python3 crawler_main.py -u https://monzo.com/ --log DEBUG -n 5  
 ```
-
 
 ```
 
@@ -83,20 +86,20 @@ options:
 
 ```
 
-## Files
-
-crawler_main.py -> Main file which starts the crawling
-crawler_context.py -> Context class which stores all crawler parameters and internals
-crawler_utils.py -> functions used at various steps of crawling
-parse_arguments.py -> converting command line arguments to Context Class
-
-test_crawler.py -> some unit and intergation tests to ensure crawler is working properly
-
-To run tests -  
+To run tests
 ```
 python3  -m unittest tests/test_crawler.py
-
 ```
+
+
+## Files
+
+crawler_main.py -> Main file which starts the crawling  
+crawler_context.py -> Context class which stores all crawler parameters and internals  
+crawler_utils.py -> functions used at various steps of crawling  
+parse_arguments.py -> converting command line arguments to Context Class  
+test_crawler.py -> some unit and intergation tests to ensure crawler is working properly
+
 
 ## Future Work & Known Issues
 
