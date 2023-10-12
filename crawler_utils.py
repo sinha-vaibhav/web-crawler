@@ -23,9 +23,6 @@ def get_url_scheme_and_domain(url : str) -> (str,str):
 
     return (scheme, domain)
 
-def get_starting_url(scheme : str, domain : str) -> str:
-    return urlunparse((scheme, domain,'','','',''))
-
 class HTMLLinkParser(HTMLParser):
 
     

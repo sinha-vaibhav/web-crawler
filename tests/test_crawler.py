@@ -46,7 +46,7 @@ class TestCrawler(unittest.TestCase):
         self.context = Context()
         (self.context.scheme, self.context.domain) = crawler_utils.get_url_scheme_and_domain(self.main_url)
         self.context.initialize_robot_file_parser()
-        self.context.starting_url = crawler_utils.get_starting_url(self.context.scheme, self.context.domain)
+        self.context.starting_url = self.main_url
 
 
     def request_get_side_effect(self,url):

@@ -3,7 +3,7 @@ from logging import Logger
 import logging
 from queue import Queue
 from urllib.robotparser import RobotFileParser
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlunparse
 
 
 class Context:
@@ -41,7 +41,7 @@ class Context:
 
         
     def initialize_robot_file_parser(self):
-        self.robot_file_url = urljoin(self.starting_url, "robots.txt")
+        self.robot_file_url = urljoin(urlunparse((self.scheme, self.domain,'','','','')), "robots.txt")
         self.robot_file_parser.set_url(self.robot_file_url)
         self.robot_file_parser.read()
         logging.info("Robots file parsed")

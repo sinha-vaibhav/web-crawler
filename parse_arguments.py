@@ -2,7 +2,7 @@ import argparse
 import logging
 from urllib.parse import urlunparse
 from crawler_context import Context
-from crawler_utils import get_url_scheme_and_domain, get_starting_url
+from crawler_utils import get_url_scheme_and_domain
 
 
 def parse_arguments(context : Context) -> None:
@@ -35,7 +35,7 @@ def parse_arguments(context : Context) -> None:
     
     context.log_level = args.loglevel
     
-    context.starting_url = get_starting_url(context.scheme, context.domain)
+    context.starting_url = args.url
     context.urls_to_crawl.put(context.starting_url)
 
     if args.results_file is not None:
