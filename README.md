@@ -20,7 +20,7 @@ python3 crawler_main.py -u https://monzo.com/ --log DEBUG -n 5
 for crawling max 50 urls
 
 python3 crawler_main.py -u https://monzo.com/ --log DEBUG -n 5 -m 50 
-
+```
 
 ## How it works?
 
