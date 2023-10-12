@@ -1,6 +1,6 @@
 # web-crawler
 
-This is a simple web crawler which given an initial URL,  crawls all the links inside the same subdomain starting from the parent domain and exports crawl results in a file.
+This is a simple web crawler which given an initial URL, crawls all the links inside it in the sub-doman
 
 The crawl results include the list of all urls crawled and links inside them. The links include all the links and not just links within that domain. 
 
@@ -9,15 +9,18 @@ Some of the features of the crawler:
 - can use multiple python threads to concurrently crawl multiple URLs
 - respects robots.txt file and doesn't crawl disallowed URLs
 - has logging and testing support for easier debugging and monitoring
+- supports crawling of relative links as well
 
 
 
 ## How it works?
 
-1. We specify a url of the website we want to crawl and other required parameters in the command line tool
-2. The script extracts the domain name and url scheme (http  https) from the url and creates a starting URL
-e.g. https://www.google.com/intl/en_in/business/ turns into scheme - https and domain website - www.google.com
+1. We specify a url we want to crawl and other required parameters in the command line tool
+2. The script extracts the domain name and scheme (http, https, etc.) from the url and loads the robots.txt file using it
+   e.g. if the url is https://monzo.com/sign-up/ , robots.txt file location is extracted by getting the domain and adding /robots.txt to it
+   which in this case turns out to be https://monzo.com/robots.txt
 
+   
 3. We create the initial URL to start crawling from for this website and store it to urls_to_crawl queue
 e.g. www.google.com
 
@@ -25,10 +28,13 @@ e.g. www.google.com
 
 
 ```
-   while there are urls to crawl (urls_to_crawl queue) & URLs being visited (urls_crawline queue)
+   while there are urls to crawl (urls_to_crawl queue) & URLs being visited (urls_crawling queue)
 
         we extract a URL to crawl from urls_to_crawl to queue -> url_to_crawl
 
+        if there are no urls to crawl in urls_to_crawl but urls in urls_crawling queue
+            we wait 5 seconds for urls_crawling queue and check again later if there are more urls_crawled
+   
         move this url to crawling_urls queue
 
         if robots.txt allows crawling of this URL -> We fetch that URL and extract all urls inside it, else we skip it
@@ -48,7 +54,7 @@ e.g. www.google.com
 
 ```
 
-5. once all the urls are crawled, we write the results in a file. (default : <website_domain>_crawl_results.json)
+5. once all the urls are crawled, we write the results in a file. (default : <starying_url>_crawl_results.json)
 
 ## Flow Diagram
 
@@ -80,7 +86,7 @@ options:
   -n NUM_WORKERS, --num_workers NUM_WORKERS
                         number of concurrent crawlers, default 1
   -r RESULTS_FILE, --results_file RESULTS_FILE
-                        File to write results in, by default we set it to <website-name>_crawl_results.json
+                        File to write results in, by default we set it to <startig_url>_crawl_results.json
   -log {CRITICAL,FATAL,ERROR,WARN,WARNING,INFO,DEBUG,NOTSET}, --loglevel {CRITICAL,FATAL,ERROR,WARN,WARNING,INFO,DEBUG,NOTSET}
                         Provide logging level. Example --loglevel debug, default=warning
 
