@@ -41,8 +41,9 @@ def parse_arguments(context : Context) -> None:
     if args.results_file is not None:
         context.crawl_results_file = args.results_file
     else:
-        temp_file_name = context.domain
+        temp_file_name = context.starting_url
         temp_file_name = temp_file_name.replace(".", "_")
+        temp_file_name = temp_file_name.replace("/", "_")
         context.crawl_results_file = temp_file_name + '_crawl_results.json'
 
 
